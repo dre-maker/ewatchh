@@ -46,7 +46,7 @@ Tables created: `users`, `reports`, `report_files`, `activities`, `token_blackli
 
 ```bash
 cp .env.example .env
-nano .env
+
 ```
 
 Fill in:

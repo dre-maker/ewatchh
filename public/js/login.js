@@ -16,10 +16,6 @@ function togglePwd(inputId, btn) {
   btn.textContent = f.type === 'password' ? '👁' : '🙈';
 }
 
-function fillDemo(email, password) {
-  document.getElementById('li').value = email;
-  document.getElementById('lp').value = password;
-}
 
 function calcAgeField() {
   const v = document.getElementById('rBD').value;

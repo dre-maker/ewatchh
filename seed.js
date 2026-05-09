@@ -7,34 +7,14 @@ async function seed() {
   console.log('🌱 Seeding default accounts...');
 
   const accounts = [
-    {
-      name:     'Super Admin',
+    {name:     'Super Admin',
       email:    'superadmin@ewatch.ph',
       phone:    '09100000001',
       password: 'super123',
       role:     'super-admin',
       verified: 1,
     },
-    {
-      name:     'Maria Agustin',
-      email:    'admin@ewatch.ph',
-      phone:    '09100000002',
-      password: 'admin123',
-      role:     'admin',
-      verified: 1,
-    },
-    {
-      name:       'Juan Dela Cruz',
-      email:      'juan@gmail.com',
-      phone:      '09123456789',
-      password:   'user123',
-      role:       'user',
-      verified:   1,
-      purok:      'Purok Malaya',
-      birth_date: '1999-03-12',
-      age:        25,
-      gender:     'Male',
-    },
+
   ];
 
   for (const acc of accounts) {
