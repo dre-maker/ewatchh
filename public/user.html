@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>eWatch — My Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="/css/user.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="tb-ham" id="hamBtn" onclick="toggleSidebar()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="tb-icon">🏘</div>
+    <div class="tb-flex">
+      <div class="tb-title">eWatch</div>
+      <div class="tb-sub">Barangay Bancao-Bancao</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-pill">Resident</div>
+      <div class="tb-avatar" id="topAv">?</div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="sb-overlay" id="sbOverlay"></div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="u-profile-card">
+        <div class="u-prof-av" id="sideAv">?</div>
+        <div style="min-width:0">
+          <div class="u-prof-name" id="sideName">Loading…</div>
+          <div class="u-prof-badge" id="sideVerif">Resident</div>
+        </div>
+      </div>
+      <div class="s-sec">My Dashboard</div>
+      <div class="nav-item active" onclick="goUserPage('overview',this)"><span class="ni">⊞</span> Overview</div>
+      <div class="s-sec">Reports</div>
+      <div class="nav-item" onclick="goUserPage('report',this)"><span class="ni">＋</span> Send Report</div>
+      <div class="nav-item" onclick="goUserPage('history',this)"><span class="ni">📋</span> My Reports</div>
+      <div class="s-sec">Account</div>
+      <div class="nav-item" onclick="goUserPage('account',this)"><span class="ni">◉</span> My Account</div>
+      <div class="s-foot">
+        <div class="logout-nav" onclick="doLogout()"><span class="ni">⎋</span> Logout</div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="main-pad">
+
+        <!-- OVERVIEW -->
+        <div id="pg-overview" class="page active">
+          <div class="pg-title" id="welcomeName">Hi there 👋</div>
+          <div class="pg-sub">Your eWatch report summary</div>
+          <div id="verifyBanner" class="verify-banner" style="display:none">
+            ⚠ Your account is pending verification by barangay officials. You cannot submit reports yet.
+          </div>
+          <div class="user-stats">
+            <div class="usc c1"><div class="usc-icon">📋</div><div class="usc-num" id="u-total">—</div><div class="usc-lbl">Total Reports</div></div>
+            <div class="usc c2"><div class="usc-icon">⏳</div><div class="usc-num" id="u-pend">—</div><div class="usc-lbl">Pending</div></div>
+            <div class="usc c3"><div class="usc-icon">🔄</div><div class="usc-num" id="u-prog">—</div><div class="usc-lbl">In Progress</div></div>
+            <div class="usc c4"><div class="usc-icon">✓</div><div class="usc-num" id="u-done">—</div><div class="usc-lbl">Resolved</div></div>
+          </div>
+          <div class="g2">
+            <div class="card">
+              <div class="card-title">Report Status</div>
+              <div style="position:relative;height:190px"><canvas id="uChart"></canvas></div>
+              <div style="display:flex;justify-content:center;gap:14px;margin-top:10px;flex-wrap:wrap">
+                <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)"><span style="width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block"></span>Pending</span>
+                <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)"><span style="width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block"></span>In Progress</span>
+                <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)"><span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>Done</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">Recent Reports</div>
+              <div id="u-recentR"><div style="color:var(--text3);font-size:13px;text-align:center;padding:1.5rem">Loading…</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEND REPORT -->
+        <div id="pg-report" class="page">
+          <div class="pg-title">Send Report</div>
+          <div class="pg-sub">Submit a community concern to barangay officials</div>
+          <div class="report-card">
+            <div class="inline-alert ia-err" id="fErr"></div>
+            <div class="inline-alert ia-ok"  id="fOk"></div>
+            <div class="fg-block">
+              <div class="flabel">Category</div>
+              <div class="cat-grid" id="catGrid"></div>
+            </div>
+            <div class="fg-block">
+              <label class="flabel" for="repType">Report Type</label>
+              <div class="sel-wrap">
+                <select class="fctrl" id="repType" style="padding-right:36px">
+                  <option value="">-- Select type --</option>
+                </select>
+                <div class="sel-arrow">▼</div>
+              </div>
+              <div class="hint-box" id="typeHint"></div>
+            </div>
+            <div class="fg-block">
+              <label class="flabel" for="repLoc">Location / Purok</label>
+              <div class="sel-wrap">
+                <select class="fctrl" id="repLoc" style="padding-right:36px">
+                  <option value="">-- Select location --</option>
+                  <option>Purok Malaya</option>
+                  <option>Purok Bagong Buhay</option>
+                  <option>Purok Maligaya</option>
+                  <option>Purok Masikap</option>
+                  <option>Purok Pagkakaisa</option>
+                  <option>Near Barangay Hall</option>
+                  <option>Along Main Road</option>
+                </select>
+                <div class="sel-arrow">▼</div>
+              </div>
+            </div>
+            <div class="fg-block">
+              <label class="flabel" for="repDesc">Description</label>
+              <textarea class="fctrl" id="repDesc" placeholder="Describe what happened — include time, persons involved, and other relevant details…"></textarea>
+            </div>
+            <div class="fg-block">
+              <div class="flabel">Evidence <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">(optional)</span></div>
+              <div class="upload-zone" id="uploadZone"
+                   onclick="document.getElementById('fileInp').click()"
+                   ondragover="onDragOver(event)"
+                   ondragleave="onDragLeave()"
+                   ondrop="onDrop(event)">
+                <input type="file" id="fileInp" accept="image/*,video/*" multiple style="display:none" onchange="handleFiles(this.files)">
+                <div class="u-icon">📎</div>
+                <div class="u-txt">Click or drag &amp; drop to upload</div>
+                <div class="u-sub">JPG, PNG, MP4 · Max 10MB each · Up to 5 files</div>
+              </div>
+              <div id="filePreview" style="display:none">
+                <div class="preview-grid" id="previewGrid"></div>
+              </div>
+            </div>
+            <button class="btn-submit" onclick="submitReport()">✉ Submit Report</button>
+          </div>
+        </div>
+
+        <!-- MY REPORTS -->
+        <div id="pg-history" class="page">
+          <div class="pg-title">My Reports</div>
+          <div class="pg-sub">Track all your submitted reports</div>
+          <div class="tbl-card">
+            <div class="tbl-toolbar">
+              <input class="tbl-search" id="hSrch" placeholder="Search…" oninput="renderUserHistory()">
+              <select class="tbl-filter" id="hSt" onchange="renderUserHistory()">
+                <option value="">All statuses</option>
+                <option>Pending</option>
+                <option>In Progress</option>
+                <option>Done</option>
+              </select>
+              <span class="tbl-cnt" id="hCnt"></span>
+            </div>
+            <div class="tbl-scroll">
+              <table>
+                <thead>
+                  <tr><th>#</th><th>Type</th><th>Location</th><th>Description</th><th>Files</th><th>Status</th><th>Date</th></tr>
+                </thead>
+                <tbody id="histTbody"></tbody>
+              </table>
+              <div class="tbl-empty" id="hEmpty" style="display:none">No reports yet. Submit your first one!</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCOUNT -->
+        <div id="pg-account" class="page">
+          <div class="pg-title">My Account</div>
+          <div class="pg-sub">Personal information and settings</div>
+          <div class="g2">
+            <div class="card">
+              <div class="card-title">👤 Personal Information</div>
+              <div id="acctInfo"><div style="color:var(--text3);font-size:13px">Loading…</div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">⚙ Settings</div>
+              <p style="font-size:13px;color:var(--text2);margin-bottom:1rem;line-height:1.5">Manage your profile and preferences.</p>
+              <button class="btn-acct">✏ Edit profile</button>
+              <button class="btn-acct">🔔 Notifications</button>
+              <button class="btn-acct">🔑 Change password</button>
+              <button class="btn-acct danger" onclick="doLogout()">⎋ Logout</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><div class="t-dot"></div><span id="toastMsg"></span></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/user.js"></script>
+</body>
+</html>

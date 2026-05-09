@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eWatch — Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shared.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <button class="tb-ham" id="hamBtn" onclick="toggleSidebar()"><span></span><span></span><span></span></button>
+    <div class="tb-icon">🏘</div>
+    <div class="tb-flex"><div class="tb-title">eWatch Admin</div><div class="tb-sub">Barangay Bancao-Bancao</div></div>
+    <div class="tb-right"><div class="tb-pill">Barangay Admin</div><div class="tb-avatar" id="topAv">?</div></div>
+  </div>
+  <div class="body">
+    <div class="sb-overlay" id="sbOverlay"></div>
+    <div class="sidebar" id="sidebar">
+      <div class="s-sec">Main</div>
+      <div class="nav-item active" onclick="goPage('overview',this)"><span class="ni">⊞</span> Overview</div>
+      <div class="nav-item"        onclick="goPage('census',this)"><span class="ni">👥</span> Census</div>
+      <div class="s-sec">Reports</div>
+      <div class="nav-item" onclick="goPage('reports',this)"><span class="ni">🚩</span> Reports <span class="nbadge" id="pendBadge">0</span></div>
+      <div class="nav-item" onclick="goPage('verif',this)"><span class="ni">✅</span> Verifications <span class="nbadge" id="verifBadge">0</span></div>
+      <div class="nav-item" onclick="goPage('activities',this)"><span class="ni">🕐</span> Activities</div>
+      <div class="s-foot"><div class="logout-nav" onclick="doLogout()"><span class="ni">⎋</span> Logout</div></div>
+    </div>
+    <div class="main">
+      <div class="main-pad">
+
+        <div id="pg-overview" class="page active">
+          <div class="pg-title">Overview</div><div class="pg-sub">Barangay Bancao-Bancao monitoring dashboard</div>
+          <div class="stats-row">
+            <div class="sc c1"><div class="sc-icon">👥</div><div class="sc-num" id="ov-res">—</div><div class="sc-lbl">Total Residents</div></div>
+            <div class="sc c2"><div class="sc-icon">🚩</div><div class="sc-num" id="ov-rep">—</div><div class="sc-lbl">Total Reports</div></div>
+            <div class="sc c3"><div class="sc-icon">⏳</div><div class="sc-num" id="ov-pend">—</div><div class="sc-lbl">Pending</div></div>
+            <div class="sc c4"><div class="sc-icon">✔</div><div class="sc-num"  id="ov-done">—</div><div class="sc-lbl">Resolved</div></div>
+          </div>
+          <div class="g31">
+            <div class="card"><div class="card-hdr"><span class="card-title">Top Reported Residents</span></div><div id="topList"><div style="color:var(--text3);font-size:13px">Loading…</div></div></div>
+            <div class="card">
+              <div class="card-hdr"><span class="card-title">Report Status</span></div>
+              <div style="position:relative;height:180px"><canvas id="ovChart"></canvas></div>
+              <div style="display:flex;justify-content:center;gap:12px;margin-top:10px;flex-wrap:wrap">
+                <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--text2)"><span style="width:7px;height:7px;border-radius:50%;background:var(--amber);display:inline-block"></span>Pending</span>
+                <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--text2)"><span style="width:7px;height:7px;border-radius:50%;background:var(--blue);display:inline-block"></span>In Progress</span>
+                <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--text2)"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block"></span>Done</span>
+              </div>
+            </div>
+          </div>
+          <div class="g2">
+            <div class="card"><div class="card-hdr"><span class="card-title">Recent Reports</span></div><div id="recentR"><div style="color:var(--text3);font-size:13px">Loading…</div></div></div>
+            <div class="card"><div class="card-hdr"><span class="card-title">Recent Activities</span></div><div id="recentA"><div style="color:var(--text3);font-size:13px">Loading…</div></div></div>
+          </div>
+        </div>
+
+        <div id="pg-census" class="page">
+          <div class="pg-title">Census</div><div class="pg-sub">Resident records management</div>
+          <div class="cc-grid">
+            <div class="cc"><div class="cc-top"><div class="cc-icon" style="background:var(--indigo-l)">👥</div><span class="cc-pct b-ind">100%</span></div><div class="cc-num" id="cc-total">—</div><div class="cc-lbl">Total</div></div>
+            <div class="cc"><div class="cc-top"><div class="cc-icon" style="background:var(--blue-l)">♂</div><span class="cc-pct b-male" id="cc-mpct">0%</span></div><div class="cc-num" id="cc-male">—</div><div class="cc-lbl">Male</div></div>
+            <div class="cc"><div class="cc-top"><div class="cc-icon" style="background:var(--pink-l)">♀</div><span class="cc-pct b-female" id="cc-fpct">0%</span></div><div class="cc-num" id="cc-female">—</div><div class="cc-lbl">Female</div></div>
+            <div class="cc"><div class="cc-top"><div class="cc-icon" style="background:var(--amber-l)">★</div><span class="cc-pct b-emergency" id="cc-srpct">0%</span></div><div class="cc-num" id="cc-senior">—</div><div class="cc-lbl">Senior</div></div>
+            <div class="cc"><div class="cc-top"><div class="cc-icon" style="background:var(--teal-l)">♿</div><span class="cc-pct b-teal" id="cc-pwdpct">0%</span></div><div class="cc-num" id="cc-pwd">—</div><div class="cc-lbl">PWD</div></div>
+          </div>
+          <button class="btn-add" onclick="openResModal('add')">＋ Add Resident</button>
+          <div class="tbl-card">
+            <div class="tbl-toolbar">
+              <input class="tbl-search" id="cSrch" placeholder="Search residents…" oninput="renderCensus()">
+              <select class="tbl-filter" id="cPk" onchange="renderCensus()"><option value="">All puroks</option><option>Purok Malaya</option><option>Purok Bagong Buhay</option><option>Purok Maligaya</option><option>Purok Masikap</option><option>Purok Pagkakaisa</option></select>
+              <select class="tbl-filter" id="cGn" onchange="renderCensus()"><option value="">All genders</option><option>Male</option><option>Female</option></select>
+              <select class="tbl-filter" id="cTg" onchange="renderCensus()"><option value="">All types</option><option value="senior">Senior</option><option value="pwd">PWD</option></select>
+              <span class="tbl-cnt" id="cCnt"></span>
+            </div>
+            <div class="tbl-scroll"><table>
+              <thead><tr><th>Full name</th><th>Purok</th><th>Age</th><th>Gender</th><th>Birth date</th><th>Tags</th><th>Actions</th></tr></thead>
+              <tbody id="censusTbody"></tbody>
+            </table><div class="tbl-empty" id="cEmpty" style="display:none">No residents found.</div></div>
+          </div>
+        </div>
+
+        <div id="pg-reports" class="page">
+          <div class="pg-title">Incident Reports</div><div class="pg-sub">All community reports submitted to eWatch</div>
+          <div class="tbl-card">
+            <div class="tbl-toolbar">
+              <input class="tbl-search" id="rSrch" placeholder="Search reports…" oninput="renderReports()">
+              <select class="tbl-filter" id="rSt" onchange="renderReports()"><option value="">All statuses</option><option>Pending</option><option>In Progress</option><option>Done</option></select>
+              <select class="tbl-filter" id="rCt" onchange="renderReports()"><option value="">All categories</option><option>Crime &amp; Safety</option><option>Infrastructure</option><option>Environment</option><option>Emergency</option><option>Noise &amp; Disturbance</option><option>Others</option></select>
+              <span class="tbl-cnt" id="rCnt"></span>
+            </div>
+            <div class="tbl-scroll"><table>
+              <thead><tr><th>#</th><th>Type</th><th>Reported by</th><th>Location</th><th>Description</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+              <tbody id="reportsTbody"></tbody>
+            </table><div class="tbl-empty" id="rEmpty" style="display:none">No reports found.</div></div>
+          </div>
+        </div>
+
+        <div id="pg-verif" class="page">
+          <div class="pg-title">Account Verifications</div>
+          <div class="pg-sub">Approve pending resident registrations — confirmation email sent automatically on approval</div>
+          <div class="tbl-card"><div class="tbl-scroll"><table>
+            <thead><tr><th>Full name</th><th>Email</th><th>Mobile</th><th>Purok</th><th>Registered</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="verifTbody"></tbody>
+          </table><div class="tbl-empty" id="vEmpty" style="display:none">✓ No pending verifications.</div></div></div>
+        </div>
+
+        <div id="pg-activities" class="page">
+          <div class="pg-title">Activity Log</div><div class="pg-sub">Recent system and admin activities</div>
+          <div class="card"><div id="actList"><div style="color:var(--text3);font-size:13px">Loading…</div></div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="resModal">
+  <div class="modal-box">
+    <div class="mdrag"></div>
+    <div class="m-title" id="resModalTitle">Add Resident</div>
+    <div class="m-sub">Register a new barangay resident</div>
+    <div class="mfg"><label>Full name *</label><input id="mRN" placeholder="Juan Dela Cruz"></div>
+    <div class="mfg"><label>Purok *</label><select id="mRP"><option value="">-- Select --</option><option>Purok Malaya</option><option>Purok Bagong Buhay</option><option>Purok Maligaya</option><option>Purok Masikap</option><option>Purok Pagkakaisa</option></select></div>
+    <div class="m2">
+      <div class="mfg"><label>Birth date</label><input type="date" id="mRBD" max="2006-12-31"></div>
+      <div class="mfg"><label>Age</label><input id="mRA" type="number" readonly placeholder="Auto"></div>
+    </div>
+    <div class="mfg"><label>Gender</label><select id="mRG"><option value="">-- Select --</option><option>Male</option><option>Female</option></select></div>
+    <div class="m2">
+      <div class="mfg"><label>Senior citizen?</label><select id="mRSr"><option value="0">No</option><option value="1">Yes (60+)</option></select></div>
+      <div class="mfg"><label>PWD?</label><select id="mRPWD"><option value="0">No</option><option value="1">Yes</option></select></div>
+    </div>
+    <div class="mfg"><label>Mobile</label>
+      <div style="display:flex;gap:6px">
+        <div style="padding:10px 8px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:12px;font-weight:700;color:var(--text2)">+63</div>
+        <input id="mRPhone" type="tel" placeholder="9XXXXXXXXX" maxlength="10" style="flex:1">
+      </div>
+    </div>
+    <div class="mactions">
+      <button class="btn btn-cancel" onclick="closeModal('resModal')">Cancel</button>
+      <button class="btn btn-save"   onclick="saveResident()">✓ Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><div class="t-dot"></div><span id="toastMsg"></span></div>
+<script src="/js/api.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/admin.js"></script>
+</body>
+</html>

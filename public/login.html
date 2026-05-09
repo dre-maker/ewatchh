@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eWatch — Login | Barangay Bancao-Bancao</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+
+  <div class="wrapper">
+
+    <!-- BRANDING -->
+    <div class="brand">
+      <div class="brand-chip">
+        <span class="brand-chip-icon">🏘</span>
+        <div>
+          <div class="brand-chip-name">eWatch System</div>
+          <div class="brand-chip-sub">Barangay Bancao-Bancao</div>
+        </div>
+      </div>
+      <h1>Digital Census &amp; Community Reporting</h1>
+      <p>Report community issues, track resolutions, and manage barangay census data — all in one secure platform for Bancao-Bancao residents and officials.</p>
+      <div class="pills">
+        <span class="pill">📋 Submit Reports</span>
+        <span class="pill">👥 Census Records</span>
+        <span class="pill">📊 Live Analytics</span>
+        <span class="pill">✅ Track Status</span>
+      </div>
+    </div>
+
+    <!-- AUTH CARD -->
+    <div class="auth-card">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('login',this)">Sign In</div>
+        <div class="tab"        onclick="switchTab('register',this)">Register</div>
+      </div>
+
+      <!-- LOGIN PANE -->
+      <div class="pane active" id="p-login">
+        <div class="pane-h">Welcome back 👋</div>
+        <div class="pane-s">Sign in to your eWatch account</div>
+        <div class="alert a-err" id="le"></div>
+        <div class="alert a-ok"  id="ls"></div>
+        <div class="fg">
+          <label>Email or Mobile Number</label>
+          <div class="fg-row">
+            <div class="cc">🇵🇭</div>
+            <input type="text" id="li" placeholder="Email or 9XXXXXXXXX" autocomplete="username" inputmode="email">
+          </div>
+        </div>
+        <div class="fg">
+          <label>Password</label>
+          <div class="pwd-wrap">
+            <input type="password" id="lp" placeholder="Enter password" autocomplete="current-password">
+            <span class="pwd-eye" onclick="togglePwd('lp',this)">👁</span>
+          </div>
+        </div>
+        <button class="btn-main" id="loginBtn" onclick="doLogin()">Sign In →</button>
+        <div class="sw">No account? <a href="#" onclick="switchTab('register',null);return false">Register here</a></div>
+        <div class="demo-box">
+          <div class="demo-h">Demo accounts — tap to fill</div>
+          <div class="demo-row">
+            <span class="dr r-sa">Super Admin</span>
+            <span class="dc">superadmin@ewatch.ph</span>
+            <button class="btn-use" onclick="fillDemo('superadmin@ewatch.ph','super123')">Use</button>
+          </div>
+          <div class="demo-row">
+            <span class="dr r-a">Admin</span>
+            <span class="dc">admin@ewatch.ph</span>
+            <button class="btn-use" onclick="fillDemo('admin@ewatch.ph','admin123')">Use</button>
+          </div>
+          <div class="demo-row">
+            <span class="dr r-u">Resident</span>
+            <span class="dc">juan@gmail.com</span>
+            <button class="btn-use" onclick="fillDemo('juan@gmail.com','user123')">Use</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTER PANE -->
+      <div class="pane" id="p-register">
+        <div class="pane-h">Create account</div>
+        <div class="pane-s">Register as a verified Bancao-Bancao resident</div>
+        <div class="alert a-err" id="re"></div>
+        <div class="alert a-ok"  id="rs"></div>
+        <div class="fg">
+          <label>Full Name *</label>
+          <input type="text" id="rN" placeholder="Juan Dela Cruz" autocomplete="name">
+        </div>
+        <div class="row2">
+          <div class="fg">
+            <label>Email *</label>
+            <input type="email" id="rEM" placeholder="juan@gmail.com" autocomplete="email" inputmode="email">
+          </div>
+          <div class="fg">
+            <label>Mobile *</label>
+            <div class="fg-row" style="gap:5px">
+              <div class="cc" style="padding:11px 7px;font-size:12px">+63</div>
+              <input type="tel" id="rPH" placeholder="9XXXXXXXXX" inputmode="tel" maxlength="10">
+            </div>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Purok</label>
+          <select id="rPK">
+            <option value="">-- Select Purok --</option>
+            <option>Purok Malaya</option>
+            <option>Purok Bagong Buhay</option>
+            <option>Purok Maligaya</option>
+            <option>Purok Masikap</option>
+            <option>Purok Pagkakaisa</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="fg">
+            <label>Birth Date *</label>
+            <input type="date" id="rBD" max="2006-12-31" onchange="calcAgeField()">
+          </div>
+          <div class="fg">
+            <label>Age</label>
+            <input type="number" id="rAG" readonly placeholder="Auto">
+          </div>
+        </div>
+        <div class="fg">
+          <label>Password *</label>
+          <div class="pwd-wrap">
+            <input type="password" id="rPW" placeholder="Min. 6 characters" autocomplete="new-password">
+            <span class="pwd-eye" onclick="togglePwd('rPW',this)">👁</span>
+          </div>
+        </div>
+        <div class="alert a-warn">
+          ⚠ Your account requires barangay verification. You will receive an email confirmation once approved.
+        </div>
+        <button class="btn-main" id="regBtn" onclick="doRegister()">Create Account →</button>
+        <div class="sw">Already registered? <a href="#" onclick="switchTab('login',null);return false">Sign in</a></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/login.js"></script>
+</body>
+</html>
