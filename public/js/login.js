@@ -68,7 +68,7 @@ async function doRegister() {
 
   try {
     await Auth.register({ name, email, phone: phone ? '09' + phone : null, password: pw, purok, birth_date: birth || null, age });
-    showAlert('rs', `✅ Account created! A confirmation email has been sent to ${email}. Awaiting barangay verification.`, 'ok');
+    showAlert('rs', `Account created! A confirmation email has been sent to ${email}. Awaiting barangay verification.`, 'ok');
     setTimeout(() => switchTab('login', null), 3500);
   } catch (err) {
     showAlert('re', err.data?.message || 'Registration failed. Please try again.', 'err');
