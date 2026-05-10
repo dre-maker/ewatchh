@@ -16,6 +16,10 @@ function togglePwd(inputId, btn) {
   btn.textContent = f.type === 'password' ? '👁' : '🙈';
 }
 
+function fillDemo(email, password) {
+  document.getElementById('li').value = email;
+  document.getElementById('lp').value = password;
+}
 
 function calcAgeField() {
   const v = document.getElementById('rBD').value;
@@ -36,9 +40,9 @@ async function doLogin() {
     const user = await Auth.login(inp, pw);
     showAlert('ls', `Welcome, ${user.name}! Redirecting…`, 'ok');
     setTimeout(() => {
-      if      (user.role === 'super-admin') location.href = 'superadmin.html';
-      else if (user.role === 'admin')       location.href = 'admin.html';
-      else                                  location.href = 'user.html';
+      if      (user.role === 'super-admin') location.href = '/superadmin.html';
+      else if (user.role === 'admin')       location.href = '/admin.html';
+      else                                  location.href = '/user.html';
     }, 700);
   } catch (err) {
     showAlert('le', err.data?.message || 'Invalid credentials.', 'err');
@@ -78,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Redirect if already logged in
   const user = getCurrentUser();
   if (user && getToken()) {
-    if      (user.role === 'super-admin') location.href = 'superadmin.html';
-    else if (user.role === 'admin')       location.href = 'admin.html';
-    else                                  location.href = 'user.html';
+    if      (user.role === 'super-admin') location.href = '/superadmin.html';
+    else if (user.role === 'admin')       location.href = '/admin.html';
+    else                                  location.href = '/user.html';
   }
 });
