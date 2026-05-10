@@ -243,7 +243,10 @@ async function renderReports() {
       <td style="min-width:160px;font-size:12.5px">${(r.description||'').length>55?(r.description).slice(0,55)+'…':r.description}</td>
       <td style="min-width:90px;font-size:12px">${formatDate(r.created_at)}</td>
       <td style="min-width:90px">${statusBadge(r.status)}</td>
-      <td style="min-width:90px"><button class="btn btn-info" onclick="cycleStatus('${r.id}','${r.status}')">↻ Update</button></td>
+      <td style="min-width:160px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-info"   onclick="viewReport('${r.id}')">👁 View</button>
+        <button class="btn btn-warn"   onclick="cycleStatus('${r.id}','${r.status}')">↻ Update</button>
+      </td>
     </tr>`).join('');
   } catch (err) { console.error('Reports error', err); }
 }
@@ -254,6 +257,82 @@ async function cycleStatus(id, current) {
   try {
     await Reports.updateStatus(id, next);
     showToast(`Status → "${next}"`);
+    await renderAll(); setTimeout(buildChart, 100);
+  } catch (err) { handleApiError(err); }
+}
+
+/* ── VIEW REPORT MODAL ── */
+async function viewReport(id) {
+  try {
+    const r = await Reports.getOne(id);
+    const el = document.getElementById('viewReportBody');
+    if (!el) return;
+
+    const statusColors = { 'Pending':'b-pending', 'In Progress':'b-inprogress', 'Done':'b-done' };
+    const filesHtml = r.files && r.files.length
+      ? r.files.map(f => `
+          <a href="/api/uploads/${f.filename}" target="_blank"
+             style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;font-size:12px;color:var(--indigo);text-decoration:none;font-weight:600">
+            📎 ${f.original}
+          </a>`).join('')
+      : '<span style="color:var(--text3);font-size:13px">No attachments</span>';
+
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:18px;font-weight:800;color:var(--text)">${r.type}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">${r.category}</div>
+        </div>
+        <span class="badge ${statusColors[r.status]||'b-ind'}" style="font-size:13px;padding:5px 14px">${r.status}</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem">
+        <div style="background:var(--bg);border-radius:8px;padding:12px">
+          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Reported by</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text)">${r.user_name}</div>
+          <div style="font-size:12px;color:var(--text2)">${r.user_email||''}</div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:12px">
+          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Location</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text)">${r.location||'—'}</div>
+          <div style="font-size:12px;color:var(--text2)">${r.purok||''}</div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:12px">
+          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Date submitted</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text)">${formatDate(r.created_at)}</div>
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:12px">
+          <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Report ID</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);font-family:var(--mono)">#${String(r.id).padStart(4,'0')}</div>
+        </div>
+      </div>
+
+      <div style="background:var(--bg);border-radius:8px;padding:14px;margin-bottom:1rem">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Description</div>
+        <div style="font-size:14px;color:var(--text);line-height:1.6">${r.description}</div>
+      </div>
+
+      <div style="margin-bottom:1rem">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Attachments</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">${filesHtml}</div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:1rem;border-top:1px solid var(--border)">
+        <button class="btn btn-green"  onclick="cycleStatusFromModal('${r.id}','${r.status}','Pending')">Set Pending</button>
+        <button class="btn btn-info"   onclick="cycleStatusFromModal('${r.id}','${r.status}','In Progress')">Set In Progress</button>
+        <button class="btn btn-warn"   onclick="cycleStatusFromModal('${r.id}','${r.status}','Done')">Set Done</button>
+        <button class="btn btn-cancel" onclick="closeModal('viewReportModal')" style="margin-left:auto">Close</button>
+      </div>`;
+
+    openModal('viewReportModal');
+  } catch (err) { handleApiError(err); }
+}
+
+async function cycleStatusFromModal(id, current, newStatus) {
+  try {
+    await Reports.updateStatus(id, newStatus);
+    showToast(`Status → "${newStatus}"`);
+    closeModal('viewReportModal');
     await renderAll(); setTimeout(buildChart, 100);
   } catch (err) { handleApiError(err); }
 }
